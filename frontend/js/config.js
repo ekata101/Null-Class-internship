@@ -1,5 +1,5 @@
 // Change this to your backend URL in production
-window.API = "http://localhost:3000";
+const API_BASE = "";
 
 // i18n translations (multilanguage support)
 window.TRANSLATIONS = {
