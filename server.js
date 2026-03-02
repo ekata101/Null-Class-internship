@@ -1,6 +1,8 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 
@@ -9,35 +11,30 @@ import paymentRoutes from "./routes/payment.routes.js";
 import questionRoutes from "./routes/question.routes.js";
 import otpRoutes from "./routes/otp.routes.js";
 
-const app = express();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middlewares
 app.use(cors());
 app.use(express.json());
 
-// Auth: Register, Login, Profile, Forgot Password
+// API Routes
 app.use("/api/auth", authRoutes);
-
-// Subscription & Payment
 app.use("/api/payment", paymentRoutes);
-
-// Q&A with AI answers
 app.use("/api/questions", questionRoutes);
-
-// OTP for Multilanguage switching
 app.use("/api/otp", otpRoutes);
 
-app.get("/", (req, res) => {
-  res.send("Combined Backend running ✅");
-});
-
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log("Server running on port", PORT);
-});
-const path = require("path");
-
+// Serve Frontend
 app.use(express.static(path.join(__dirname, "frontend")));
 
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "frontend", "index.html"));
+});
+
+// Start Server (ONLY ONCE)
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
