@@ -77,22 +77,11 @@ async function apiFetch(path, options = {}) {
     ...(options.headers || {}),
   };
 
-  try {
-    const res = await fetch(path, {
-      ...options,
-      headers,
-    });
+  const res = await fetch(path, {
+    ...options,
+    headers,
+  });
 
-    let data = {};
-    try {
-      data = await res.json();
-    } catch {
-      data = {};
-    }
-
-    return { res, data };
-  } catch (err) {
-    console.error("API Error:", err);
-    throw err;
-  }
+  const data = await res.json();
+  return { res, data };
 }
