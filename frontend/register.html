@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register – QA Platform</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container">
+  <h1>Create Account 🚀</h1>
+  <p class="subtitle">Join to ask questions and get instant AI answers.</p>
+
+  <h2>Sign Up</h2>
+
+  <input type="email" id="email" placeholder="Email (Gmail only)">
+
+  <div class="password-group">
+    <input type="password" id="password" placeholder="Password" oninput="checkPasswordStrength()">
+    <span class="eye" onclick="togglePassword('password', this)">👁️</span>
+  </div>
+  <div id="strengthContainer"><div id="strengthBar"></div></div>
+  <p id="strengthText"></p>
+
+  <div class="password-group">
+    <input type="password" id="confirmPassword" placeholder="Confirm Password">
+    <span class="eye" onclick="togglePassword('confirmPassword', this)">👁️</span>
+  </div>
+
+  <p id="error" style="color:#ef4444;font-size:13px;margin-top:5px;"></p>
+
+  <button onclick="register()">Create Account</button>
+
+  <a onclick="window.location='index.html'">Already have an account? Login</a>
+
+  <div id="msg" class="msg"></div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  async function register() {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+    const error = document.getElementById("error");
+    error.innerText = "";
+
+    if (!email.endsWith("@gmail.com")) {
+      error.innerText = "Only Gmail addresses are allowed";
+      return;
+    }
+    if (password.length < 6) {
+      error.innerText = "Password must be at least 6 characters";
+      return;
+    }
+    if (password !== confirmPassword) {
+      error.innerText = "Passwords do not match";
+      return;
+    }
+    if (
+      password.length < 8 ||
+      !/[A-Z]/.test(password) ||
+      !/[a-z]/.test(password) ||
+      !/[0-9]/.test(password) ||
+      !/[@#$!%*?&]/.test(password)
+    ) {
+      error.innerText = "Password must be strong (8+ chars, uppercase, lowercase, number & symbol)";
+      return;
+    }
+
+    try {
+      const { res, data } = await apiFetch("/api/auth/register", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
+        showMessage(data.message, "error");
+        return;
+      }
+      showMessage("Account created! Redirecting to login...", "success");
+      setTimeout(() => window.location = "index.html", 1200);
+    } catch {
+      error.innerText = "Server not responding";
+    }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login – QA Platform</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container">
+  <h1>Welcome Back 👋</h1>
+  <p class="subtitle">Ask questions, manage subscriptions, and track your usage.</p>
+
+  <h2>Login</h2>
+
+  <input type="email" id="email" placeholder="Email">
+
+  <div class="password-group">
+    <input type="password" id="password" placeholder="Password">
+    <span class="eye" onclick="togglePassword('password', this)">👁️</span>
+  </div>
+
+  <button onclick="login()">Login</button>
+
+  <a onclick="window.location='register.html'">Don't have an account? Sign up</a>
+  <a onclick="window.location='forgot-password.html'">Forgot password?</a>
+
+  <div id="msg" class="msg"></div>
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  // Redirect if already logged in
+  if (localStorage.getItem("token")) window.location = "dashboard.html";
+
+  async function login() {
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!email || !password) {
+      showMessage("Please enter email and password", "error");
+      return;
+    }
+
+    try {
+      const { res, data } = await apiFetch("/api/auth/login", {
+        method: "POST",
+        body: JSON.stringify({ email, password }),
+      });
+
+      if (!res.ok) {
+        showMessage(data.message, "error");
+        return;
+      }
+
+      localStorage.setItem("token", data.token);
+      showMessage("Login successful! Redirecting...", "success");
+      setTimeout(() => window.location = "dashboard.html", 800);
+    } catch {
+      showMessage("Server not responding", "error");
+    }
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ask – QA Platform</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <div class="dashboard-header">
+    <h1>💬 Ask a Question</h1>
+    <p style="color:rgba(255,255,255,0.8);font-size:13px;margin-top:4px;">
+      Get instant AI answers on software development topics.
+    </p>
+    <div class="dashboard-actions">
+      <button class="back-btn" onclick="window.location='dashboard.html'">← Dashboard</button>
+      <button class="logout" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="ask-card">
+    <h2>Post Your Question</h2>
+
+    <input type="text" id="title" placeholder="Type your question here... (e.g. What is React?)">
+
+    <button onclick="ask()">🚀 Ask Now</button>
+
+    <div id="msg" class="msg" style="margin-top:14px;"></div>
+
+    <div style="margin-top:16px;">
+      <label style="font-size:13px;color:#666;">AI Answer:</label>
+      <textarea id="aiAnswer" rows="7"
+        placeholder="AI answer will appear here..."
+        style="margin-top:6px;resize:vertical;"
+        readonly></textarea>
+    </div>
+
+    <div class="ask-actions" style="margin-top:12px;">
+      <button class="back-btn" onclick="window.location='dashboard.html'">← Back</button>
+      <button class="upgrade-btn" onclick="window.location='pricing.html'">⭐ Upgrade</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  requireAuth();
+
+  async function ask() {
+    const title = document.getElementById("title").value.trim();
+    const aiAnswer = document.getElementById("aiAnswer");
+
+    if (!title) {
+      showMessage("Please enter a question", "error");
+      return;
+    }
+
+    aiAnswer.value = "";
+    showMessage("Submitting...", "info");
+
+    try {
+      const { res, data } = await apiFetch("/api/questions/ask", {
+        method: "POST",
+        body: JSON.stringify({ title }),
+      });
+
+      if (!res.ok) {
+        showMessage(data.message, "error");
+        return;
+      }
+
+      aiAnswer.value = data.aiAnswer;
+      showMessage("Question posted successfully!", "success");
+    } catch {
+      showMessage("Server error. Please try again.", "error");
+    }
+  }
+</script>
+</body>
+</html>

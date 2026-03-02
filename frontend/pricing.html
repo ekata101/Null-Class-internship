@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pricing – QA Platform</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <div class="dashboard-header">
+    <h1>Choose Your Plan ⭐</h1>
+    <p style="color:rgba(255,255,255,0.8);font-size:13px;margin-top:4px;">
+      Payments are processed between 10–11 AM IST only.
+    </p>
+    <div class="dashboard-actions">
+      <button class="ask-btn" onclick="window.location='dashboard.html'">← Dashboard</button>
+      <button class="logout" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="pricing-grid">
+
+    <div class="plan-card">
+      <h3>Free</h3>
+      <p class="price">₹0</p>
+      <ul>
+        <li>✔ 1 question / day</li>
+        <li>✔ Basic AI answers</li>
+        <li>✔ No expiry</li>
+      </ul>
+      <button disabled style="background:#ccc;color:#666;cursor:not-allowed;">Current Default</button>
+    </div>
+
+    <div class="plan-card">
+      <h3>Bronze 🥉</h3>
+      <p class="price">₹100 / month</p>
+      <ul>
+        <li>✔ 5 questions / day</li>
+        <li>✔ Email support</li>
+        <li>✔ Invoice by email</li>
+      </ul>
+      <button onclick="subscribe('BRONZE')">Subscribe</button>
+    </div>
+
+    <div class="plan-card">
+      <h3>Silver 🥈</h3>
+      <p class="price">₹300 / month</p>
+      <ul>
+        <li>✔ 10 questions / day</li>
+        <li>✔ Priority access</li>
+        <li>✔ Invoice by email</li>
+      </ul>
+      <button onclick="subscribe('SILVER')">Subscribe</button>
+    </div>
+
+    <div class="plan-card">
+      <h3>Gold 🥇</h3>
+      <p class="price">₹1000 / month</p>
+      <ul>
+        <li>✔ Unlimited questions</li>
+        <li>✔ Premium support</li>
+        <li>✔ Invoice by email</li>
+      </ul>
+      <button onclick="subscribe('GOLD')">Subscribe</button>
+    </div>
+
+  </div>
+
+  <div id="msg" class="msg" style="margin-top:20px;max-width:420px;width:100%;"></div>
+
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  requireAuth();
+
+  async function subscribe(plan) {
+    try {
+      const { res, data } = await apiFetch("/api/payment/pay", {
+        method: "POST",
+        body: JSON.stringify({ plan }),
+      });
+
+      if (!res.ok) {
+        showMessage(data.message, "error");
+        return;
+      }
+
+      showMessage(`${plan} plan activated! Invoice sent to your email.`, "success");
+      setTimeout(() => window.location = "dashboard.html", 2000);
+    } catch {
+      showMessage("Server not responding", "error");
+    }
+  }
+</script>
+</body>
+</html>

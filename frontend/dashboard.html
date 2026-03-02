@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard – QA Platform</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="page-wrapper">
+
+  <div class="dashboard-header">
+    <h1 id="welcomeMsg">My Dashboard</h1>
+    <p style="color:rgba(255,255,255,0.8);font-size:14px;margin-top:4px;" id="planBadge"></p>
+    <div class="dashboard-actions">
+      <button class="ask-btn" onclick="window.location='ask.html'">💬 Ask a Question</button>
+      <button class="upgrade-btn" onclick="window.location='pricing.html'">⭐ Upgrade Plan</button>
+      <button class="lang-btn" onclick="window.location='language.html'">🌐 Change Language</button>
+      <button class="forgot-btn" onclick="window.location='forgot-password.html'">🔐 Forgot Password</button>
+      <button class="logout" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- Profile Info Card -->
+  <div class="container" style="max-width:500px;margin:0 auto;">
+    <h2>👤 My Profile</h2>
+    <div class="profile-info">
+      <p><b>Email:</b> <span id="email">—</span></p>
+      <p><b>Plan:</b> <span id="plan">—</span> <span id="planTag" class="badge"></span></p>
+      <p><b>Daily Limit:</b> <span id="limit">—</span> questions/day</p>
+      <p><b>Plan Valid Till:</b> <span id="expiry">—</span></p>
+    </div>
+
+    <div id="msg" class="msg"></div>
+
+    <button class="ask-btn" style="margin-top:20px;" onclick="window.location='ask.html'">💬 Ask a Question</button>
+    <button class="upgrade-btn" style="margin-top:10px;" onclick="window.location='pricing.html'">⭐ Upgrade Plan</button>
+  </div>
+
+</div>
+
+<script src="js/config.js"></script>
+<script src="js/auth.js"></script>
+<script>
+  requireAuth();
+  applyTranslations();
+
+  async function loadProfile() {
+    try {
+      const { res, data } = await apiFetch("/api/auth/profile");
+      if (!res.ok) {
+        if (res.status === 401) {
+          logout();
+          return;
+        }
+        showMessage("Failed to load profile", "error");
+        return;
+      }
+
+      document.getElementById("email").textContent = data.email;
+      document.getElementById("plan").textContent = data.plan;
+      document.getElementById("limit").textContent = data.daily_limit;
+      document.getElementById("expiry").textContent = data.expires_at
+        ? new Date(data.expires_at).toLocaleDateString()
+        : "N/A (Free)";
+      document.getElementById("welcomeMsg").textContent = `${window.t("dashboard")} 👋`;
+
+      const badgeEl = document.getElementById("planTag");
+      badgeEl.textContent = data.plan;
+      badgeEl.className = `badge badge-${data.plan.toLowerCase()}`;
+      document.getElementById("planBadge").textContent = `Current plan: ${data.plan}`;
+    } catch {
+      showMessage("Failed to load profile", "error");
+    }
+  }
+
+  loadProfile();
+</script>
+</body>
+</html>
